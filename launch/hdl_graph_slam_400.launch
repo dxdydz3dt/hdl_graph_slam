@@ -11,7 +11,7 @@
   <arg name="enable_robot_odometry_init_guess" default="false" />
 
   <!-- transformation between lidar and base_link -->
-  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0 0 -0.28 0 0 0.7071068 0.7071068 base_link velodyne 10" />
+  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0.2 0 1 0 0.2617993877991494 0 base_link velodyne 10" />
 
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
