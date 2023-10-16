@@ -3,6 +3,7 @@
 import rospy
 import tf  # Add this import line
 from geometry_msgs.msg import TransformStamped
+import time  # Import the time module
 
 
 class ScanMatchingOdom:
@@ -17,9 +18,12 @@ class ScanMatchingOdom:
         )
         self.pose_file = open(self.pose_file_path, "w")
         self.pose_file.write("#timestamp tx ty tz qx qy qz qw\n")
+        self.start_time = None  # Initialize the start time
 
     def callback(self, odom_msg):
         try:
+            if self.start_time is None:
+                self.start_time = time.time()
             self.odom_msg = odom_msg
             self.save_pose_data()
         except Exception as e:
@@ -40,14 +44,28 @@ class ScanMatchingOdom:
     def spin(self):
         rospy.spin()
 
+    def finish(self):
+        if self.start_time is not None:
+            end_time = time.time()
+            total_processing_time = end_time - self.start_time
+            with open("processing_time.log", "a") as log_file:
+                log_file.write(
+                    f"Total processing time: {total_processing_time:.2f} seconds\n"
+                )
+            self.pose_file.close()
+
 
 def main():
     rospy.init_node("ScanMatchingOdom")
     node = ScanMatchingOdom()
     rate = rospy.Rate(10.0)
-    while not rospy.is_shutdown():
-        node.spin()
-        rate.sleep()
+
+    try:
+        while not rospy.is_shutdown():
+            node.spin()
+            rate.sleep()
+    finally:
+        node.finish()
 
 
 if __name__ == "__main__":
